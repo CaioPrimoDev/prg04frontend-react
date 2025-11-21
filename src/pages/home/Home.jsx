@@ -1,5 +1,5 @@
 import Header from "../../components/Header";
-import Footer from "../../components/footer";
+import Footer from "../../components/Footer";
 import CardFilm from "../../components/cardFilm";
 import poster1 from "../../assets/images/Matrix-locandina.jpg";
 import poster2 from "../../assets/images/interestelar.jpeg";
