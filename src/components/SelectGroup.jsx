@@ -1,4 +1,4 @@
-import "../assets/styles/selectGroup.css";
+import "../assets/styles/SelectGroup.css";
 
 function SelectGroup({ title, options }) {
   return (

@@ -1,0 +1,29 @@
+body {
+  padding-top: 10px; /* ajuste do espaçamento superior */
+}
+
+
+.info-section {
+  background-color: black;
+  color: #000;
+  padding: 0.5% 0.25% 0.1% 0.25%;
+}
+
+.section-shop div {
+  background-color: yellow;
+}
+
+.film-section div {
+  background-color: rgb(76, 67, 188);
+}
+
+.section-shop,
+.film-section {
+  margin: 0;
+}
+
+.btn-big {
+  min-width: 200px;
+  font-size: 1.2rem;
+  padding: 0.5rem 3rem;
+}

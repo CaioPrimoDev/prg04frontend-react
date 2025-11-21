@@ -24,7 +24,7 @@ function PoltronasPage() {
       <div className="fixed-bottom">
         <FooterNav
           onBack={() => navigate(-1)}
-          onNext={() => navigate("/resumo")}
+          onNext={() => navigate("/ingressos/compra/poltronas/resumo")}
         />
       </div>
     </>
