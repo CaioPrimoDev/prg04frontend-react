@@ -1,0 +1,26 @@
+.custom-modal {
+  background-color: #001219;
+  color: #fff;
+  border-radius: 16px;
+  padding: 10px 15px;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.modal-content {
+  background-color: #001219;
+  color: #f8f9fa;
+  border-radius: 16px;
+  border: 1px solid #0a9396;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+.modal-header,
+.modal-body {
+  border: none;
+}
+
+.btn-close-white {
+  filter: invert(1);
+}

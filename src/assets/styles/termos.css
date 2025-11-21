@@ -1,0 +1,24 @@
+.terms-font {
+  font-family: 'Arial', sans-serif;
+  color: #333;
+}
+
+.fonte-size {
+  font-size: 0.85rem;
+  margin: 20px;
+  text-align: justify;
+}
+
+.btn-big {
+  min-width: 200px;
+  font-size: 1.2rem;
+  padding: 0.5rem 3rem;
+}
+
+@media (min-width: 992px) {
+  .fonte-size {
+    font-size: 0.9rem;
+    margin: 20px;
+    text-align: justify;
+  }
+}

@@ -1,0 +1,27 @@
+/* ===== CARDS DE FILMES ===== */
+.card {
+  background-color: #001219; /* mesma cor do fundo */
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.15); /* borda branca bem suave */
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05), /* leve brilho branco */
+              0 2px 8px rgba(0, 0, 0, 0.5); /* sombra escura para profundidade */
+  border-radius: 0.75rem; /* cantos suavemente arredondados */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* animação suave */
+  flex: 0 0 auto;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-body .btn {
+  margin-top: auto; /* empurra o botão para o final */
+}
+
+/* Efeito ao passar o mouse */
+.card:hover {
+  transform: translateY(-5px); /* "suspende" o card */
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.08),
+              0 4px 12px rgba(0, 0, 0, 0.6);
+}

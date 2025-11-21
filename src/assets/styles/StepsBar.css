@@ -1,0 +1,48 @@
+.nav-steps {
+  width: 100%;
+  padding: 4px 8px;
+  background-color: #001219; /* fundo sólido */
+  position: fixed;
+  top: 0;
+  z-index: 1050; /* fica acima do conteúdo */
+}
+
+.steps-h {
+  display: flex;
+  gap: 5px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.steps-h li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #fff;
+}
+
+.steps-h li::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #888;
+  background: #fff;
+}
+
+/* Etapa concluída */
+.steps-h li.done::before {
+  background: #4caf50; /* verde */
+  border-color: #4caf50;
+}
+
+/* Etapa atual */
+.steps-h li.current::before {
+  background: #2196f3; /* azul */
+  border-color: #2196f3;
+}

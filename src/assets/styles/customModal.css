@@ -1,0 +1,73 @@
+/* ===== MODAIS ===== */
+
+/* Conteúdo principal do modal */
+.modal-content {
+  background-color: #001219;
+  color: #f8f9fa; /* texto claro */
+  border-radius: 16px;
+  border: 1px solid #0a9396; /* borda leve turquesa, opcional */
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6); /* sombra geral */
+}
+
+/* Cabeçalho e corpo sem borda */
+.modal-header,
+.modal-body {
+  border: none;
+}
+
+/* Botão fechar branco */
+.btn-close-white {
+  filter: invert(1);
+}
+
+/* Modal customizado (layout mais estreito) */
+.custom-modal {
+  background-color: #001219;
+  color: #fff;
+  border-radius: 16px;
+  padding: 10px 15px;
+  /* max-width: 360px;  <-- REMOVER ou aumentar */
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .custom-modal {
+    width: 95%;
+    max-width: none;
+  }
+}
+
+/* Campos de formulário */
+.form-control-custom {
+  background-color: #012a3a;
+  border: 1px solid #01394f;
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.form-control-custom::placeholder {
+  color: #9bbfcf;
+}
+
+.form-control-custom:focus {
+  border-color: #0dcaf0;
+  box-shadow: 0 0 6px #0dcaf0;
+  background-color: #012a3a;
+  color: #fff;
+}
+
+/* Link alternar (login/cadastro) */
+.link-alternar {
+  text-align: center;
+  display: block;
+  color: #0dcaf0;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.link-alternar:hover {
+  color: #6bdfff;
+  text-decoration: underline;
+}

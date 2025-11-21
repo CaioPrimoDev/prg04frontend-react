@@ -1,0 +1,62 @@
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background-color: #001219;
+  padding: 1.25rem 1rem;
+}
+
+.logo {
+  height: 2rem;
+  width: auto;
+}
+
+.logo-text {
+  font-size: 1.3em;
+  color: #fff;
+}
+
+.navbar-collapse.custom-collapse {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* extras do seu CSS */
+.logo-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.right-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.menu-item {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.menu-item a {
+  font-weight: bold;
+  color: #cccccc;
+  text-decoration: none;
+  transition: color 0.7s ease;
+}
+
+.destaque {
+  background-color: #e50914;
+}

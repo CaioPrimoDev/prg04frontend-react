@@ -1,0 +1,5 @@
+.poster {
+  max-width: 300px;   /* limite máximo */
+  height: auto;       /* mantém proporção */
+  border-radius: 8px; /* opcional */
+}
