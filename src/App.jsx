@@ -3,7 +3,7 @@ import './index.css';
 import Home from "./pages/home/Home";
 import Ingressos from "./pages/movies/ingressos";
 import IngressosCompra from "./pages/payment/ingresso/IngressosCompra";
-import Modals from "./pages/Modals"; // ou onde você salvar
+import Modals from "./components/user/Modals";
 import PoltronasPage from "./pages/salas/poltronas";
 import TermosDeUso from "./pages/terms/TermosDeUso";
 import ResumoPage from "./pages/payment/resumo/ResumoPage";
