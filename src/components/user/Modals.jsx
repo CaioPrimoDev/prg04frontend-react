@@ -65,29 +65,30 @@ function Modals() {
       window.location.reload(); 
 
     } catch (error) {
-       console.error("Erro completo:", error); // Mantenha isso para debug
+       console.error("Erro no cadastro:", error); 
 
        let mensagemErro = "Erro ao cadastrar.";
 
        if (error.response && error.response.data) {
            const data = error.response.data;
 
-           // Erro de Validação (Sua classe ValidationExceptionDetails)
-           // Ela devolve uma lista de mensagens em 'fieldsMessage'
+           // 1. Prioridade: Erros de Validação (Ex: Senha curta, CPF inválido no @Valid)
+           // Sua classe ValidationExceptionDetails retorna 'fieldsMessage'
            if (data.fieldsMessage && Array.isArray(data.fieldsMessage) && data.fieldsMessage.length > 0) {
-               // Pega a primeira mensagem de erro da lista (ex: "O email deve ser válido")
                mensagemErro = data.fieldsMessage[0];
            }
-           // Erro de Regra de Negócio (BusinessException)
-           // Geralmente tem um campo 'message' ou 'mensagem'
+           // 2. Erros de Regra de Negócio (Ex: BusinessException "CPF já cadastrado")
+           // Sua classe ErrorResponse deve retornar 'message'
            else if (data.message) {
                mensagemErro = data.message;
            }
+           // 3. Fallback para 'details' se houver
            else if (data.details) {
                mensagemErro = data.details;
            }
-       } else if (error.message) {
-           // Erro de conexão (sem response do servidor)
+       } 
+       // 4. Erro de conexão (Backend desligado)
+       else if (error.message) {
            mensagemErro = error.message;
        }
 
