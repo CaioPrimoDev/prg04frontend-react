@@ -65,13 +65,33 @@ function Modals() {
       window.location.reload(); 
 
     } catch (error) {
-      console.error(error);
-      // Tratamento de erro visual continua aqui
-      if (error.response?.status === 403 || error.response?.status === 401) {
-        setLoginError("Credenciais inválidas.");
-      } else {
-        setLoginError("Erro ao conectar com o servidor.");
-      }
+       console.error("Erro completo:", error); // Mantenha isso para debug
+
+       let mensagemErro = "Erro ao cadastrar.";
+
+       if (error.response && error.response.data) {
+           const data = error.response.data;
+
+           // Erro de Validação (Sua classe ValidationExceptionDetails)
+           // Ela devolve uma lista de mensagens em 'fieldsMessage'
+           if (data.fieldsMessage && Array.isArray(data.fieldsMessage) && data.fieldsMessage.length > 0) {
+               // Pega a primeira mensagem de erro da lista (ex: "O email deve ser válido")
+               mensagemErro = data.fieldsMessage[0];
+           }
+           // Erro de Regra de Negócio (BusinessException)
+           // Geralmente tem um campo 'message' ou 'mensagem'
+           else if (data.message) {
+               mensagemErro = data.message;
+           }
+           else if (data.details) {
+               mensagemErro = data.details;
+           }
+       } else if (error.message) {
+           // Erro de conexão (sem response do servidor)
+           mensagemErro = error.message;
+       }
+
+       setCadastroError(mensagemErro);
     }
   };
 
