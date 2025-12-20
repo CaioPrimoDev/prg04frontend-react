@@ -16,6 +16,7 @@ function SeatMap() {
       <div className="principal">
 
         {/* LATERAL ESQUERDA */}
+        {/* GUIA DAS POLTRONAS */}
         <div className="lateral-esquerda">
           <div className="fileira-letra">H</div>
           <div className="fileira-letra">G</div>
@@ -220,6 +221,7 @@ function SeatMap() {
         </div>
 
         {/* LATERAL DIREITA */}
+        {/* GUIA DAS POLTRONAS */}
         <div className="lateral-direita">
           <div className="fileira-letra">H</div>
           <div className="fileira-letra">G</div>

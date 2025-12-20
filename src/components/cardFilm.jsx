@@ -10,7 +10,10 @@ function CardFilm({ image, title, description }) {
           <h5 className="card-title">{title}</h5>
           {description && <p className="card-text">{description}</p>}
           {/* Botão padrão leva para /ingressos */}
-          <Link to="/terms" className="btn btn-primary">
+          <Link 
+              to="/terms" 
+              className="btn btn-danger"
+          >
             Comprar Ingressos
           </Link>
         </div>
