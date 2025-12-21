@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 // Importe seu CSS aqui se tiver
 
 function CustomModal({
@@ -17,9 +17,9 @@ function CustomModal({
   const [formData, setFormData] = useState({});
 
   // Limpa os dados sempre que o modal for aberto/fechado
-  useEffect(() => {
+  /*useEffect(() => {
     if (clearMessages) clearMessages();
-  }, [id, clearMessages]);
+  }, [id, clearMessages]);*/
 
   const handleChange = (e) => {
     setFormData({
@@ -28,7 +28,7 @@ function CustomModal({
     });
     
     // Limpa o erro assim que o usuário começa a corrigir
-    if (clearMessages) clearMessages();
+    //if (clearMessages) clearMessages();
   };
 
   const handleSubmit = (e) => {
