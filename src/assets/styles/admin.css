@@ -1,0 +1,124 @@
+
+/* Variáveis */
+:root {
+  --admin-bg: #001219;
+  --admin-sidebar-width: 250px;
+  --admin-gold: #FFD700; /* Dourado */
+  --admin-red: #e50914;  
+  --header-height: 85px; /* Altura do header */
+}
+
+/* Container Principal */
+.admin-container {
+  display: flex;
+  min-height: calc(100vh - var(--header-height));
+  position: relative;
+  top: 0; /* O padding-top já está no body global */
+}
+
+.admin-sidebar {
+  background-color: #000a0e; /* Um pouco mais escuro que o fundo normal */
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  width: var(--admin-sidebar-width);
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  padding-top: calc(var(--header-height) + 1rem); /* Fica logo abaixo do Header */
+  left: 0;
+  z-index: 1000;
+  transition: transform 0.3s ease-in-out;
+  overflow-y: auto;
+  padding: 1rem;
+  
+  /* MOBILE FIRST: Escondida por padrão em telas pequenas */
+  transform: translateX(-100%);
+}
+
+/* Classe para mostrar a sidebar no mobile quando ativa */
+.admin-sidebar.open {
+  transform: translateX(0);
+  box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+}
+
+/* --- CONTEÚDO PRINCIPAL --- */
+.admin-content {
+  flex: 1;
+  padding: 20px;
+  transition: margin-left 0.3s ease-in-out;
+  width: 100%;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  color: #adb5bd;
+  text-decoration: none;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.sidebar-link:hover {
+  background-color: rgba(255, 215, 0, 0.1); /* Dourado bem suave */
+  color: var(--admin-gold);
+}
+
+.sidebar-link.active {
+  background-color: var(--admin-red);
+  color: white;
+  box-shadow: 0 2px 5px rgba(229, 9, 20, 0.4);
+}
+
+.sidebar-link i {
+  margin-right: 10px;
+  font-size: 1.1rem;
+}
+
+.font-recursive {
+  font-size: 1.2rem;
+}
+
+small.font-recursive {
+  font-size: 0.8rem;
+  color: #d0bbbb !important;
+}
+
+a.font-recursive {
+  font-size: 0.9rem;  
+}
+
+/* --- DESKTOP (Telas maiores que 992px) --- */
+@media (min-width: 992px) {
+  /* No PC, a sidebar está sempre visível */
+  .admin-sidebar {
+    transform: translateX(0);
+  }
+
+  /* O conteúdo empurra para a direita para dar espaço à barra */
+  .admin-content {
+    margin-left: var(--admin-sidebar-width);
+  }
+  
+  /* Esconde o botão de toggle no PC pois não é necessário */
+  .mobile-toggle-btn {
+    display: none !important; 
+  }
+
+  .font-recursive {
+    font-family: 'Recursive', sans-serif;
+    font-size: 1.7rem; /* 16px - O tamanho padrão da maioria dos navegadores */
+  }
+
+  small.font-recursive {
+    font-family: 'Recursive', sans-serif;
+    font-size: 1rem; /* 14px - O padrão do Bootstrap para textos pequenos */
+    color: #d0bbbb !important;
+  }
+
+  a.font-recursive {
+    font-family: 'Recursive', sans-serif;
+    font-size: 1.2rem; /* Mantém links de navegação com o mesmo peso do texto normal */
+  }
+}

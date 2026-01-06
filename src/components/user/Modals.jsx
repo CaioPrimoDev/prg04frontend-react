@@ -1,12 +1,14 @@
 import { useState, useCallback } from "react";
-import CustomModal from "../customModal";
-import authService from "../../api/authService";
+import CustomModal from "../customModal"; // Certifique-se que o caminho está certo
+import authService from "../../api/authService"; // Para o registro
+import { useAuth } from "../../api/context/AuthContext"; // Para o login
+import * as bootstrap from 'bootstrap'; // Importação correta do Bootstrap
 
-// LOGIN É "TEXT" (Para aceitar CPF ou Email) ---
+// --- CONFIGURAÇÃO DOS CAMPOS (Pode ficar aqui ou em outro arquivo) ---
 const camposLogin = [
   { 
-    name: "identificador", // Nome genérico para o input
-    type: "text",          // Mudei de 'email' para 'text' para não exigir '@'
+    name: "identificador", 
+    type: "text", 
     placeholder: "E-mail ou CPF", 
     required: true 
   },
@@ -21,89 +23,84 @@ const camposCadastro = [
 ];
 
 function Modals() {
+  const { login } = useAuth(); // Usamos o login do Contexto!
+  
+  // Estados de erro/sucesso
   const [loginError, setLoginError] = useState("");
   const [cadastroError, setCadastroError] = useState("");
   const [cadastroSuccess, setCadastroSuccess] = useState("");
+  
+  // Estado de carregamento (Spinner)
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Isso impede que ela seja recriada a cada renderização, parando o loop.
   const limparMensagens = useCallback(() => {
     setLoginError("");
     setCadastroError("");
     setCadastroSuccess("");
-  }, []); // O array vazio [] diz: "Nunca recrie esta função"
+  }, []);
 
+  // Função auxiliar para fechar modal via JS
   const fecharModal = (modalId) => {
     const modalEl = document.getElementById(modalId);
-    if (window.bootstrap) {
-      const modalInstance = window.bootstrap.Modal.getInstance(modalEl) || new window.bootstrap.Modal(modalEl);
-      modalInstance.hide();
+    if (modalEl) {
+        const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modalInstance.hide();
     }
-    const backdrops = document.querySelectorAll('.modal-backdrop');
-    backdrops.forEach(bd => bd.remove());
-    document.body.classList.remove('modal-open');
-    document.body.style = "";
   };
 
-  // --- LOGIN LIMPO ---
+  // Função auxiliar para trocar de modal (Cadastro -> Login)
+  const trocarModal = (fecharId, abrirId) => {
+      fecharModal(fecharId);
+      setTimeout(() => {
+          const abrirEl = document.getElementById(abrirId);
+          if(abrirEl) {
+            const modalInstance = new bootstrap.Modal(abrirEl);
+            modalInstance.show();
+          }
+      }, 300); // Pequeno delay para animação fluir
+  };
+
+  // --- LÓGICA DE LOGIN ---
   const handleLoginSubmit = async (dados) => {
     limparMensagens();
+    setIsLoading(true); // Ativa spinner
     
-    // Lógica de limpar o CPF continua aqui pois é regra de VISUALIZAÇÃO/Input
+    // Limpeza do identificador (CPF)
     let identificador = dados.identificador;
     if (!identificador.includes('@')) {
        identificador = identificador.replace(/\D/g, ""); 
     }
 
     try {
-      // O componente chama o serviço. Não importa a rota nem o axios aqui.
-      await authService.login({
+      // Chama o login do AuthContext
+      await login({
         login: identificador, 
         senha: dados.senha
       });
       
+      // Se passar daqui, deu certo. Fechamos o modal.
       fecharModal("loginModal");
-      window.location.reload(); 
+      // NÃO precisa de reload. O Contexto atualiza o Header sozinho.
 
     } catch (error) {
-       console.error("Erro no cadastro:", error); 
-
-       let mensagemErro = "Erro ao cadastrar.";
-
-       if (error.response && error.response.data) {
-           const data = error.response.data;
-
-           // 1. Prioridade: Erros de Validação (Ex: Senha curta, CPF inválido no @Valid)
-           // Sua classe ValidationExceptionDetails retorna 'fieldsMessage'
-           if (data.fieldsMessage && Array.isArray(data.fieldsMessage) && data.fieldsMessage.length > 0) {
-               mensagemErro = data.fieldsMessage[0];
-           }
-           // 2. Erros de Regra de Negócio (Ex: BusinessException "CPF já cadastrado")
-           // Sua classe ErrorResponse deve retornar 'message'
-           else if (data.message) {
-               mensagemErro = data.message;
-           }
-           // 3. Fallback para 'details' se houver
-           else if (data.details) {
-               mensagemErro = data.details;
-           }
-       } 
-       // 4. Erro de conexão (Backend desligado)
-       else if (error.message) {
-           mensagemErro = error.message;
-       }
-
-       setCadastroError(mensagemErro);
+       console.error("Erro no Login:", error); 
+       // Se o backend retornar 401/403
+       setLoginError("Usuário ou senha inválidos.");
+    } finally {
+        setIsLoading(false); // Desativa spinner independente do resultado
     }
   };
 
-  // --- CADASTRO LIMPO ---
+  // --- LÓGICA DE CADASTRO ---
   const handleCadastroSubmit = async (dados) => {
     limparMensagens();
-
+    
     if (dados.senha !== dados.confirmarSenha) {
       setCadastroError("As senhas não conferem!");
       return;
     }
+
+    setIsLoading(true); // Ativa spinner
 
     const cpfLimpo = dados.cpf.replace(/\D/g, ""); 
 
@@ -111,48 +108,63 @@ function Modals() {
       cpf: cpfLimpo,
       email: dados.email,
       senha: dados.senha,
-      perfis: ["CLIENTE"]
     };
 
     try {
-      // Chama o serviço
+      // Cadastro não precisa passar pelo Context, usa o Service direto
       await authService.register(usuarioDTO);
       
-      setCadastroSuccess("Conta criada! Redirecionando...");
+      setCadastroSuccess("Conta criada com sucesso! Redirecionando para login...");
       
+      // Espera 2 segundos mostrando a mensagem de sucesso e troca para Login
       setTimeout(() => {
-        fecharModal("cadastroModal");
-        const loginBtn = new window.bootstrap.Modal(document.getElementById('loginModal'));
-        loginBtn.show();
+        trocarModal("cadastroModal", "loginModal");
+        setCadastroSuccess(""); // Limpa msg para a próxima vez
       }, 2000);
 
     } catch (error) {
-       // ... (Logica de erro visual igual) ...
-       const msg = error.response?.data?.message || "Erro ao cadastrar.";
-       setCadastroError(msg);
+       let mensagemErro = "Erro ao cadastrar.";
+
+       if (error.response && error.response.data) {
+           const data = error.response.data;
+           // Lógica de tratamento de erro do seu Backend
+           if (data.fieldsMessage && data.fieldsMessage.length > 0) {
+               mensagemErro = data.fieldsMessage[0]; // Pega o primeiro erro da lista
+           } else if (data.message) {
+               mensagemErro = data.message;
+           } else if (data.details) {
+               mensagemErro = data.details;
+           }
+       }
+       setCadastroError(mensagemErro);
+    } finally {
+       setIsLoading(false);
     }
   };
 
   return (
     <>
+      {/* MODAL LOGIN */}
       <CustomModal
         id="loginModal"
         title="Entrar"
         fields={camposLogin}
-        submitText="Entrar"
+        submitText={isLoading ? "Entrando..." : "Entrar"} // Muda o texto se estiver carregando
         submitType="submit"
         onSubmit={handleLoginSubmit}
         errorMessage={loginError}
         clearMessages={limparMensagens}
         footerLinkText="Não tem conta? Cadastre-se"
         footerTarget="cadastroModal"
+        isLoading={isLoading} // Passamos o estado para desabilitar o botão
       />
 
+      {/* MODAL CADASTRO */}
       <CustomModal
         id="cadastroModal"
         title="Criar Conta"
         fields={camposCadastro}
-        submitText="Cadastrar"
+        submitText={isLoading ? "Cadastrando..." : "Cadastrar"}
         submitType="submit"
         onSubmit={handleCadastroSubmit}
         errorMessage={cadastroError}
@@ -160,6 +172,7 @@ function Modals() {
         clearMessages={limparMensagens}
         footerLinkText="Já tem conta? Faça login"
         footerTarget="loginModal"
+        isLoading={isLoading}
       />
     </>
   );

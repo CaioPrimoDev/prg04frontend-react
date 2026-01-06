@@ -1,5 +1,4 @@
-import { useState } from "react";
-// Importe seu CSS aqui se tiver
+import { useState, useEffect } from "react";
 
 function CustomModal({
   id,
@@ -10,16 +9,21 @@ function CustomModal({
   footerLinkText,
   footerTarget,
   onSubmit,
-  errorMessage,   // Recebe mensagem de erro do Pai
-  successMessage, // Recebe mensagem de sucesso do Pai
-  clearMessages   // Função para limpar avisos
+  errorMessage,
+  successMessage,
+  clearMessages,
+  isLoading = false 
 }) {
   const [formData, setFormData] = useState({});
 
-  // Limpa os dados sempre que o modal for aberto/fechado
-  /*useEffect(() => {
-    if (clearMessages) clearMessages();
-  }, [id, clearMessages]);*/
+  // CORREÇÃO 1 e 2:
+  // Removemos o setFormData({}) daqui pois ele causava o render duplo.
+  // Adicionamos clearMessages nas dependências para satisfazer o linter.
+  useEffect(() => {
+     if(clearMessages) {
+        clearMessages();
+     }
+  }, [id, clearMessages]); 
 
   const handleChange = (e) => {
     setFormData({
@@ -27,8 +31,10 @@ function CustomModal({
       [e.target.name]: e.target.value,
     });
     
-    // Limpa o erro assim que o usuário começa a corrigir
-    //if (clearMessages) clearMessages();
+    // Limpa msg de erro ao digitar
+    if (errorMessage && clearMessages) {
+        clearMessages();
+    }
   };
 
   const handleSubmit = (e) => {
@@ -36,6 +42,12 @@ function CustomModal({
     if (onSubmit) {
       onSubmit(formData);
     }
+  };
+
+  // Função auxiliar para limpar tudo (usada nos botões de fechar)
+  const handleCloseOrSwitch = () => {
+      setFormData({}); // Limpa os inputs
+      if(clearMessages) clearMessages(); // Limpa as mensagens de erro
   };
 
   return (
@@ -47,11 +59,19 @@ function CustomModal({
             <h5 className="modal-title w-100 text-center" id={`${id}Label`}>
               {title}
             </h5>
-            <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            {/* Botão X (Fechar) */}
+            <button 
+                type="button" 
+                className="btn-close btn-close-white" 
+                data-bs-dismiss="modal" 
+                aria-label="Fechar"
+                disabled={isLoading}
+                // Adicionamos a limpeza aqui também
+                onClick={handleCloseOrSwitch} 
+            ></button>
           </div>
 
           <div className="modal-body">
-            {/* --- EXIBIÇÃO DE MENSAGENS --- */}
             {errorMessage && (
               <div className="alert alert-danger py-2 text-center" style={{ fontSize: "0.85rem" }}>
                 {errorMessage}
@@ -69,19 +89,30 @@ function CustomModal({
                   <input
                     type={field.type}
                     name={field.name}
-                    className="form-control" // Se tiver CSS customizado, adicione aqui
+                    className="form-control"
                     placeholder={field.placeholder}
                     required={field.required}
-                    // O value é importante para limpar o form depois
                     value={formData[field.name] || ""} 
                     onChange={handleChange}
-                    // Adiciona minLength se for senha ou cpf pra ajudar na validação básica
+                    disabled={isLoading}
                     minLength={field.name === "cpf" ? 11 : undefined}
                   />
                 </div>
               ))}
-              <button type={submitType} className="btn btn-danger w-100">
-                {submitText}
+              
+              <button 
+                type={submitType} 
+                className="btn btn-danger w-100 mt-2"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                    <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Processando...
+                    </>
+                ) : (
+                    submitText
+                )}
               </button>
             </form>
           </div>
@@ -90,14 +121,13 @@ function CustomModal({
             <div className="modal-footer border-0 justify-content-center">
               <a
                 href="#"
-                className="link-secundario" // Adicione estilo se quiser
+                className={`link-secundario ${isLoading ? 'disabled' : ''}`}
+                style={{ pointerEvents: isLoading ? 'none' : 'auto' }}
                 data-bs-target={`#${footerTarget}`}
                 data-bs-toggle="modal"
                 data-bs-dismiss="modal"
-                onClick={() => {
-                   if(clearMessages) clearMessages();
-                   setFormData({});
-                }}
+                // Ao clicar no link do rodapé (trocar modal), limpamos tudo
+                onClick={handleCloseOrSwitch}
               >
                 {footerLinkText}
               </a>
@@ -109,4 +139,4 @@ function CustomModal({
   );
 }
 
-export default CustomModal;
+export default CustomModal; 
