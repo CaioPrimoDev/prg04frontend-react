@@ -34,7 +34,9 @@ function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Navigate to="filmes" replace />} />
             <Route path="filmes" element={<FilmesLista />} />
+
             <Route path="filmes/novo" element={<FilmeForm />} />
+
             <Route path="/admin/filmes/editar/:id" element={<FilmeForm />} />
           </Route>
 

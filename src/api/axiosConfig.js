@@ -23,4 +23,20 @@ api.interceptors.request.use(
   }
 );
 
+api.interceptors.response.use(
+    response => response, // Se der certo, só retorna
+    error => {
+        // Se der erro 403 (Proibido/Expirado)
+        if (error.response && error.response.status === 403) {
+            // Verifica se não é a própria tela de login para não entrar em loop
+            if (!window.location.pathname.includes('/login')) {
+                alert("Sua sessão expirou. Por favor, faça login novamente.");
+                localStorage.removeItem("token"); // Limpa o token podre
+                window.location.href = "/login"; // Manda pro login
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
 export default api;

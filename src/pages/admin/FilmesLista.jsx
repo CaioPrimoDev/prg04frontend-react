@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react'; // Adicionei useState
 import { Link } from 'react-router-dom';
 import CardFilm from '../../components/cardFilm';
-import { useFilmes } from './useFilmes'; // Importe o seu hook aqui
+import { useFilmes } from './useFilmes';
 
 const FilmesLista = () => {
-    // Extraímos toda a lógica e dados do nosso Hook
+    // Hooks existentes
     const {
         filmes,
         loading,
@@ -19,6 +19,33 @@ const FilmesLista = () => {
         formatarClassificacao,
         formatarPreco
     } = useFilmes();
+
+    // --- NOVO: Estado para controlar a URL do trailer no iframe ---
+    const [trailerUrl, setTrailerUrl] = useState(null);
+
+    // --- NOVO: Função Mágica para converter link do YouTube em Embed ---
+    const getEmbedUrl = (url) => {
+        if (!url) return null;
+        // Regex que pega o ID tanto de 'youtube.com/watch?v=' quanto de 'youtu.be/'
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}?autoplay=1` : null;
+    };
+
+    // --- NOVO: Função para abrir o trailer ---
+    const handleAssistirTrailer = (urlOriginal) => {
+        const embed = getEmbedUrl(urlOriginal);
+        if (embed) {
+            setTrailerUrl(embed);
+        } else {
+            alert("URL do trailer inválida ou não encontrada.");
+        }
+    };
+
+    // --- NOVO: Função para limpar o vídeo ao fechar (para o som não continuar tocando) ---
+    const limparTrailer = () => {
+        setTrailerUrl(null);
+    };
 
     return (
         <div className="container-fluid text-white mb-5">
@@ -122,7 +149,7 @@ const FilmesLista = () => {
                 </>
             )}
 
-            {/* MODAL DE DETALHES */}
+            {/* MODAL DE DETALHES (FILME SELECIONADO) */}
             <div className="modal fade" id="modalDetalhes" tabIndex="-1" aria-hidden="true">
                 <div className="modal-dialog modal-lg modal-dialog-centered">
                     <div className="modal-content bg-dark text-white border-secondary shadow-lg">
@@ -169,16 +196,54 @@ const FilmesLista = () => {
                                                 </div>
                                             </div>
                                             
+                                            {/* BOTÃO ATUALIZADO: ABRE O NOVO MODAL DE VÍDEO */}
                                             {filmeSelecionado.trailerYoutube && (
-                                                <a href={filmeSelecionado.trailerYoutube} target="_blank" rel="noreferrer" className="btn btn-outline-danger w-100 mt-4">
+                                                <button 
+                                                    className="btn btn-outline-danger w-100 mt-4"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#modalTrailer"
+                                                    onClick={() => handleAssistirTrailer(filmeSelecionado.trailerYoutube)}
+                                                >
                                                     <i className="bi bi-youtube me-2"></i>Assistir Trailer
-                                                </a>
+                                                </button>
                                             )}
                                         </div>
                                     </div>
                                 </div>
                             </>
                         )}
+                    </div>
+                </div>
+            </div>
+
+            {/* --- NOVO: MODAL EXCLUSIVO PARA O TRAILER --- */}
+            <div 
+                className="modal fade" 
+                id="modalTrailer" 
+                tabIndex="-1" 
+                aria-hidden="true" 
+                // Este evento é importante: se o usuário clicar fora, queremos limpar o vídeo
+                onClick={(e) => { if(e.target.id === 'modalTrailer') limparTrailer() }}
+            >
+                <div className="modal-dialog modal-xl modal-dialog-centered">
+                    <div className="modal-content bg-black border-secondary">
+                        <div className="modal-header border-0 pb-0">
+                            <h5 className="modal-title text-white">Trailer</h5>
+                            {/* Ao fechar, limpamos a URL para o som parar */}
+                            <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onClick={limparTrailer}></button>
+                        </div>
+                        <div className="modal-body p-0">
+                            <div className="ratio ratio-16x9">
+                                {trailerUrl && (
+                                    <iframe 
+                                        src={trailerUrl} 
+                                        title="Trailer do Filme" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allowFullScreen
+                                    ></iframe>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

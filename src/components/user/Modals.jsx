@@ -3,6 +3,7 @@ import CustomModal from "../customModal"; // Certifique-se que o caminho está c
 import authService from "../../api/authService"; // Para o registro
 import { useAuth } from "../../api/context/AuthContext"; // Para o login
 import * as bootstrap from 'bootstrap'; // Importação correta do Bootstrap
+import { useNavigate } from 'react-router-dom';
 
 // --- CONFIGURAÇÃO DOS CAMPOS (Pode ficar aqui ou em outro arquivo) ---
 const camposLogin = [
@@ -23,7 +24,8 @@ const camposCadastro = [
 ];
 
 function Modals() {
-  const { login } = useAuth(); // Usamos o login do Contexto!
+  const navigate = useNavigate();
+  const { login } = useAuth(); 
   
   // Estados de erro/sucesso
   const [loginError, setLoginError] = useState("");
@@ -62,33 +64,46 @@ function Modals() {
 
   // --- LÓGICA DE LOGIN ---
   const handleLoginSubmit = async (dados) => {
-    limparMensagens();
-    setIsLoading(true); // Ativa spinner
-    
-    // Limpeza do identificador (CPF)
-    let identificador = dados.identificador;
-    if (!identificador.includes('@')) {
-       identificador = identificador.replace(/\D/g, ""); 
-    }
-
-    try {
-      // Chama o login do AuthContext
-      await login({
-        login: identificador, 
-        senha: dados.senha
-      });
+      limparMensagens();
+      setIsLoading(true); 
       
-      // Se passar daqui, deu certo. Fechamos o modal.
-      fecharModal("loginModal");
-      // NÃO precisa de reload. O Contexto atualiza o Header sozinho.
+      // Limpeza do identificador (CPF)
+      let identificador = dados.identificador;
+      if (!identificador.includes('@')) {
+        identificador = identificador.replace(/\D/g, ""); 
+      }
 
-    } catch (error) {
-       console.error("Erro no Login:", error); 
-       // Se o backend retornar 401/403
-       setLoginError("Usuário ou senha inválidos.");
-    } finally {
-        setIsLoading(false); // Desativa spinner independente do resultado
-    }
+      try {
+        // Chama o login do AuthContext
+        await login({
+          login: identificador, 
+          senha: dados.senha
+        });
+        
+        // --- AQUI É A MUDANÇA CRÍTICA ---
+        
+        // 1. Fechamos o modal (se sua função já faz o hide do Bootstrap)
+        fecharModal("loginModal");
+
+        // 2. LIMPEZA DE SEGURANÇA (O "Hack" do Backdrop)
+        // Removemos classes e elementos que o Bootstrap pode esquecer ao trocar de rota rápido
+        document.body.classList.remove('modal-open');
+        document.body.style = ''; 
+        const backdrops = document.getElementsByClassName('modal-backdrop');
+        while (backdrops.length > 0) {
+            backdrops[0].parentNode.removeChild(backdrops[0]);
+        }
+
+        // 3. Redireciona para a Home
+        navigate('/'); 
+
+      } catch (error) {
+        console.error("Erro no Login:", error); 
+        // Tratamento de erro específico para UI
+        setLoginError("Usuário ou senha inválidos.");
+      } finally {
+        setIsLoading(false); 
+      }
   };
 
   // --- LÓGICA DE CADASTRO ---

@@ -72,10 +72,30 @@ export const AuthProvider = ({ children }) => {
 
     // Função auxiliar para verificar admin
     const isAdmin = () => {
-        if (!user || !user.roles) return false;
-        return user.roles.includes("ADMIN") || 
-               user.roles.includes("ROLE_ADMIN") || 
-               user.roles.includes("GESTOR");
+        
+        // 1. Verificamos se o usuário está logado
+        if (!user) {
+            // console.log("isAdmin: Usuário nulo"); // (Opcional)
+            return false;
+        }
+
+        // --- ESPIÃO (Adicione estas linhas) ---
+        console.log("--- DEBUG PERMISSÕES ---");
+        console.log("1. Objeto User completo:", user);
+        console.log("2. Campo Roles/Role:", user.roles || user.role || "NÃO ENCONTRADO");
+        // -------------------------------------
+
+        // Sua lógica de verificação
+        if (!user.roles) return false;
+        
+        // Verifica se tem permissão (ajuste conforme o que aparecer no console)
+        const temPermissao = user.roles.includes("ADMIN") || 
+                            user.roles.includes("ROLE_ADMIN") || 
+                            user.roles.includes("GESTOR");
+                            
+        console.log("3. Resultado isAdmin:", temPermissao); // Ver se deu true ou false
+        
+        return temPermissao;
     };
 
     return (

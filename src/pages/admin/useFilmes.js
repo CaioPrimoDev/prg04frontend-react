@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+// IMPORTANTE: Certifique-se que este caminho aponta para onde você configura o axios.create()
+// E NÃO para o AuthContext.
+import api from '../../api/axiosConfig'; 
 
 export const useFilmes = () => {
     // --- ESTADOS ---
@@ -14,22 +17,23 @@ export const useFilmes = () => {
     // Modal
     const [filmeSelecionado, setFilmeSelecionado] = useState(null);
 
-    const API_URL = 'http://localhost:8080/filmes'; 
-
     // --- EFEITOS ---
     useEffect(() => {
         carregarFilmes(paginaAtual);
     }, [paginaAtual]);
 
-    // --- FUNÇÕES DE LÓGICA / API ---
+    // --- FUNÇÕES ---
+
     const carregarFilmes = async (pagina) => {
-        setLoading(true);""
+        setLoading(true);
         setErro(null);
         try {
-            const response = await fetch(`${API_URL}/findall?page=${pagina}&size=${ITENS_POR_PAGINA}`);
-            if (!response.ok) throw new Error('Falha ao comunicar com o servidor.');
+            // CORREÇÃO 1: Caminho relativo.
+            // O Axios transforma em: http://localhost:8080/filmes/findall?...
+            const response = await api.get(`/filmes/findall?page=${pagina}&size=${ITENS_POR_PAGINA}`);
             
-            const data = await response.json();
+            // Axios usa response.data para o corpo da resposta
+            const data = response.data;
             
             if (data.content) {
                 setFilmes(data.content);
@@ -38,34 +42,37 @@ export const useFilmes = () => {
                 setFilmes(data); 
             }
         } catch (error) {
-            console.error(error);
-            setErro("Não foi possível carregar o catálogo de filmes.");
+            console.error("Erro ao carregar:", error);
+            setErro("Não foi possível carregar o catálogo.");
         } finally {
             setLoading(false);
         }
     };
 
     const excluirFilme = async (id) => {
-        if (!window.confirm("Tem certeza que deseja excluir este filme permanentemente?")) return;
+        if (!window.confirm("Tem certeza que deseja excluir permanentemente?")) return;
 
         try {
-            const response = await fetch(`${API_URL}/delete/${id}`, { method: 'DELETE' });
+            // CORREÇÃO 2: Caminho relativo correto
+            // O Axios transforma em: http://localhost:8080/filmes/delete/{id}/hard
+            await api.delete(`/filmes/delete/${id}/hard`);
 
-            if (response.ok) {
-                setFilmes(prevFilmes => prevFilmes.filter(f => f.id !== id));
-                alert("Filme excluído com sucesso!");
+            // Se não deu erro no await, é sucesso (200 ou 204)
+            setFilmes(prevFilmes => prevFilmes.filter(f => f.id !== id));
+            alert("Filme excluído com sucesso!");
+
+        } catch (error) {
+            console.error("Erro ao excluir:", error);
+            if (error.response && error.response.status === 403) {
+                alert("ERRO 403: Acesso negado. Verifique se você é ADMIN e se o Token está válido.");
             } else {
                 alert("Erro ao excluir no servidor.");
             }
-        } catch (error) {
-            console.error(error);
-            alert("Erro de conexão ao tentar excluir.");
         }
     };
 
     const abrirDetalhes = (filme) => {
         setFilmeSelecionado(filme);
-        // Lógica de manipulação do DOM do Bootstrap mantida aqui para limpar a View
         setTimeout(() => {
             const modalElement = document.getElementById('modalDetalhes');
             if (modalElement && window.bootstrap) {
@@ -75,7 +82,7 @@ export const useFilmes = () => {
         }, 50);
     };
 
-    // --- FUNÇÕES DE FORMATAÇÃO (Helpers) ---
+    // --- HELPERS (Mantidos) ---
     const getClassificacaoCor = (tipo) => {
         if (!tipo) return 'bg-secondary';
         switch (tipo) {
@@ -102,12 +109,32 @@ export const useFilmes = () => {
         }
     };
 
+    const toggleStatusFilme = async (id, statusAtual) => {
+        try {
+            if (statusAtual === true) {
+                // Se está ativo, vamos desativar
+                await api.delete(`/filmes/disable/${id}`);
+            } else {
+                // Se está inativo, vamos ativar
+                await api.delete(`/filmes/activate/${id}`);
+            }
+
+            // Atualiza a lista localmente para refletir a mudança sem recarregar tudo
+            setFilmes(prev => prev.map(f => 
+                f.id === id ? { ...f, ativo: !statusAtual } : f
+            ));
+            
+        } catch (error) {
+            console.error("Erro ao alterar status:", error);
+            alert("Erro ao alterar status do filme.");
+        }
+    };
+
     const formatarPreco = (valor) => {
         if (valor === null || valor === undefined) return 'R$ --,--';
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
     };
 
-    // Retorna tudo que a View precisa usar
     return {
         filmes,
         loading,
@@ -117,6 +144,7 @@ export const useFilmes = () => {
         totalPaginas,
         filmeSelecionado,
         excluirFilme,
+        toggleStatusFilme,
         abrirDetalhes,
         getClassificacaoCor,
         formatarClassificacao,
