@@ -97,10 +97,8 @@ export const useAdminUsuarios = () => {
     // --- ALTERAR STATUS ---
     const toggleStatus = (id) => {
         if(!window.confirm("Deseja alterar o status deste usuário?")) return;
-
-        // Opcional: Você pode criar um loading específico para cada card se quiser muito detalhe
-        // mas aqui vamos manter simples.
-        fetch(`http://localhost:8080/usuarios/${id}/status`, {
+''
+        fetch(`http://localhost:8080/usuarios/alternar-status/${id}`, {
             method: 'PATCH',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -112,7 +110,8 @@ export const useAdminUsuarios = () => {
             } else {
                 alert("Erro ao alterar status");
             }
-        });
+        })
+        .catch(err => console.error("Erro na requisição:", err));
     };
 
     return {
