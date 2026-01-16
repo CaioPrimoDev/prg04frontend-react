@@ -14,7 +14,9 @@ import ResumoPage from "./pages/payment/resumo/ResumoPage";
 // PAGES ADMIN
 import AdminLayout from "./assets/layouts/AdminLayout";
 import FilmesLista from "./pages/admin/FilmesLista"; 
-import FilmeForm from "./pages/admin/FilmeForm"; 
+import FilmeForm from "./pages/admin/FilmeForm";
+// 1. IMPORTAR A NOVA PÁGINA
+import AdminUsuarios from "./pages/admin/AdminUsuarios"; 
 
 function App() {
   return (
@@ -31,13 +33,21 @@ function App() {
           <Route path="/ingressos/compra/poltronas/resumo" element={<ResumoPage />} />
 
           {/* --- ROTAS ADMINISTRATIVAS --- */}
+          {/* O AdminLayout já contém o Sidebar e o <Outlet /> onde as páginas abaixo serão renderizadas */}
           <Route path="/admin" element={<AdminLayout />}>
+            
+            {/* Redireciona /admin direto para /admin/filmes */}
             <Route index element={<Navigate to="filmes" replace />} />
+            
             <Route path="filmes" element={<FilmesLista />} />
-
             <Route path="filmes/novo" element={<FilmeForm />} />
+            
+            {/* Ajustei o path para ficar relativo (sem /admin na frente) pois já está dentro do pai */}
+            <Route path="filmes/editar/:id" element={<FilmeForm />} />
 
-            <Route path="/admin/filmes/editar/:id" element={<FilmeForm />} />
+            {/* 3. NOVA ROTA DE USUÁRIOS */}
+            <Route path="usuarios" element={<AdminUsuarios />} />
+
           </Route>
 
           {/* Fallback */}

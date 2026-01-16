@@ -48,14 +48,14 @@ function Home() {
   const getClassificacaoCor = (valor) => {
     if (!valor) return 'bg-secondary';
     
-    // Normalizamos para string para garantir a comparação
+    // Normalizei para string para garantir a comparação
     const v = valor.toString(); 
 
     // Verifica tanto o texto (DEZOITO) quanto o número ('18')
     if (v === 'LIVRE' || v === 'L') return 'bg-success';
     if (v === 'DEZ' || v === '10') return 'bg-primary';
     if (v === 'DOZE' || v === '12') return 'bg-warning text-dark';
-    if (v === 'QUATORZE' || v === '14') return 'bg-warning'; // Laranja visualmente se tiver CSS, senão Amarelo
+    if (v === 'QUATORZE' || v === '14') return 'bg-warning'; 
     if (v === 'DEZESSEIS' || v === '16') return 'bg-danger';
     if (v === 'DEZOITO' || v === '18') return 'bg-black border border-light'; // Preto com borda branca
 
